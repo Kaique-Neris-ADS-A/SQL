@@ -1,0 +1,190 @@
+/*1. Listar alunos ordenados por nome e data de nascimento
+Crie uma consulta que liste todos os alunos, ordenando-os primeiro por nome em ordem alfabética e, em caso de nomes iguais, pela data de nascimento (do mais velho para o mais novo).*/
+
+SELECT * 
+FROM aluno
+ORDER BY nome ASC, data_nascimento ASC;
+---------------------------------------------------------------------------------------------------------------------------------
+
+*/2. Listar professores e suas especialidades em ordem decrescente
+Faça uma consulta que exiba o nome dos professores e suas especialidades, ordenando os professores em ordem alfabética inversa (decrescente).*/
+
+SELECT nome, especialidade
+FROM professor
+ORDER BY nome DESC;
+------------------------------------------------------------------------------------------------------------------------------------
+
+/*3. Listar disciplinas ordenadas por carga horária
+Liste todas as disciplinas do banco de dados, ordenando-as pela carga horária em ordem decrescente.*/
+
+SELECT * 
+FROM disciplina
+ORDER BY carga_horaria DESC;
+----------------------------------------------------------------------------------------------------------------------------------
+
+/*4. Contar o número de alunos em cada status de matrícula
+Crie uma consulta que exiba o status da matrícula (Ativo, Concluído, Trancado) e o número de alunos em cada status.*/
+
+SELECT status, COUNT(*) AS quantidade_alunos
+FROM matricula
+GROUP BY status;
+---------------------------------------------------------------------------------------------------------------------------------
+
+/*5. Listar cursos com a soma total da carga horária de suas disciplinas
+Crie uma consulta que liste o nome dos cursos e a soma da carga horária total de suas disciplinas.*/
+
+SELECT curso.nome AS curso, SUM(disciplina.carga_horaria) AS carga_horaria_total
+FROM curso
+JOIN disciplina ON curso.id_curso = disciplina.id_curso
+GROUP BY curso.nome;
+------------------------------------------------------------------------------------------------------------------------------
+
+/*6. Contar quantos professores estão lecionando mais de 3 turmas
+Liste os nomes dos professores que estão lecionando mais de 3 turmas.*/
+
+SELECT professor.nome, COUNT(turma.id_turma) AS total_turmas
+FROM professor
+JOIN turma ON professor.id_professor = turma.id_professor
+GROUP BY professor.nome
+HAVING COUNT(turma.id_turma) > 3;
+-----------------------------------------------------------------------------------------------------------------------------
+
+/*7. Listar os alunos matriculados em mais de uma disciplina
+Faça uma consulta que exiba os nomes dos alunos que estão matriculados em mais de uma disciplina, ordenados pelo número de disciplinas que estão cursando.*/
+
+SELECT aluno.nome, COUNT(matricula.id_disciplina) AS total_disciplinas
+FROM aluno
+JOIN matricula ON aluno.id_aluno = matricula.id_aluno
+GROUP BY aluno.nome
+HAVING COUNT(matricula.id_disciplina) > 1
+ORDER BY total_disciplinas DESC;
+------------------------------------------------------------------------------------------------------------------------------
+
+/*8. Listar cursos com mais de 2000 horas de carga horária
+Crie uma consulta que exiba os cursos cuja soma da carga horária total de suas disciplinas seja maior que 2000 horas.*/
+
+SELECT curso.nome AS curso, curso.carga_horaria
+FROM curso
+WHERE curso.carga_horaria > 2000;
+-----------------------------------------------------------------------------------------------------------------------------
+
+/*9. Contar o número total de turmas e listar por professor
+Crie uma consulta que exiba o nome dos professores e o número total de turmas que cada professor leciona, ordenando pelos professores com mais turmas.*/
+
+SELECT professor.nome AS professor, COUNT(turma.id_turma) AS total_turmas
+FROM professor
+JOIN turma ON professor.id_professor = turma.id_professor
+GROUP BY professor.nome
+ORDER BY total_turmas DESC;
+------------------------------------------------------------------------------------------------------------------------------
+
+/*10. Listar disciplinas e a média da carga horária por curso
+Crie uma consulta que exiba o nome dos cursos e a média da carga horária de suas disciplinas.*/
+
+SELECT curso.nome AS curso, AVG(disciplina.carga_horaria) AS media_carga_horaria
+FROM curso
+JOIN disciplina ON curso.id_curso = disciplina.id_curso
+GROUP BY curso.nome;
+----------------------------------------------------------------------------------------------------------------------------------
+
+/*11. Exibir os alunos e seus respectivos status de matrícula, ordenados pelo status e pela data de matrícula
+Liste todos os alunos com seus status de matrícula, ordenando primeiro pelo status (Ativo, Concluído, Trancado) e depois pela data de matrícula em ordem decrescente.*/
+
+SELECT aluno.nome AS aluno, matricula.status, matricula.data_matricula
+FROM aluno
+JOIN matricula ON aluno.id_aluno = matricula.id_aluno
+ORDER BY 
+    CASE 
+        WHEN matricula.status = 'Ativo' THEN 1
+        WHEN matricula.status = 'Concluído' THEN 2
+        WHEN matricula.status = 'Trancado' THEN 3
+    END,
+    matricula.data_matricula DESC;
+------------------------------------------------------------------------------------------------------------------------------
+
+/*12. Exibir a idade dos alunos ordenados da maior para a menor idade
+Crie uma consulta que calcule a idade dos alunos com base na data de nascimento e exiba-os em ordem decrescente de idade (do mais velho para o mais novo).*/
+
+SELECT nome AS aluno, 
+       FLOOR(MONTHS_BETWEEN(SYSDATE, data_nascimento) / 12) AS idade
+FROM aluno
+ORDER BY idade DESC;
+----------------------------------------------------------------------------------------------------------------------------
+
+/*13. Exibir as disciplinas e o número de alunos matriculados em cada uma
+Crie uma consulta que exiba o nome das disciplinas e o número de alunos matriculados em cada uma, ordenando pelas disciplinas com mais alunos.*/
+
+SELECT disciplina.nome AS disciplina, COUNT(matricula.id_aluno) AS total_alunos
+FROM disciplina
+JOIN matricula ON disciplina.id_disciplina = matricula.id_disciplina
+GROUP BY disciplina.nome
+ORDER BY total_alunos DESC;
+----------------------------------------------------------------------------------------------------------------------------------
+
+/*14. Listar as turmas com o nome dos professores e disciplinas, ordenadas por horário
+Crie uma consulta que exiba o nome dos professores, o nome das disciplinas que eles lecionam e os horários das turmas, ordenando pelos horários.*/
+
+SELECT professor.nome AS professor, disciplina.nome AS disciplina, turma.horario
+FROM turma
+JOIN professor ON turma.id_professor = professor.id_professor
+JOIN disciplina ON turma.id_disciplina = disciplina.id_disciplina
+ORDER BY turma.horario;
+---------------------------------------------------------------------------------------------------------------------------------
+
+/*15. Contar quantas disciplinas têm carga horária superior a 80 horas
+Crie uma consulta que exiba quantas disciplinas têm uma carga horária maior que 80 horas.*/
+
+SELECT COUNT(*) AS total_disciplinas
+FROM disciplina
+WHERE carga_horaria > 80;
+-----------------------------------------------------------------------------------------------------------------------------------
+
+/*16. Listar os cursos e a quantidade de disciplinas que cada curso possui
+Faça uma consulta que exiba o nome dos cursos e a quantidade de disciplinas associadas a cada um.*/
+
+SELECT curso.nome AS curso, COUNT(disciplina.id_disciplina) AS total_disciplinas
+FROM curso
+LEFT JOIN disciplina ON curso.id_curso = disciplina.id_curso
+GROUP BY curso.nome;
+-----------------------------------------------------------------------------------------------------------------------------------
+
+/*17. Exibir os professores que têm mais de 2 disciplinas com carga horária superior a 100 horas
+Crie uma consulta que exiba os professores que lecionam mais de 2 disciplinas cuja carga horária seja superior a 100 horas.*/
+
+SELECT professor.nome AS professor, COUNT(DISTINCT disciplina.id_disciplina) AS total_disciplinas, SUM(disciplina.carga_horaria) AS soma_carga_horaria
+FROM professor
+JOIN turma ON professor.id_professor = turma.id_professor
+JOIN disciplina ON turma.id_disciplina = disciplina.id_disciplina
+GROUP BY professor.nome
+HAVING COUNT(DISTINCT disciplina.id_disciplina) > 2 AND SUM(disciplina.carga_horaria) > 100;
+-------------------------------------------------------------------------------------------------------------------------------
+
+/*18. Listar disciplinas que tenham pelo menos 5 alunos matriculados
+Faça uma consulta que liste o nome das disciplinas que têm pelo menos 5 alunos matriculados.*/
+
+SELECT disciplina.nome AS disciplina, COUNT(matricula.id_aluno) AS total_alunos
+FROM disciplina
+JOIN matricula ON disciplina.id_disciplina = matricula.id_disciplina
+GROUP BY disciplina.nome
+HAVING COUNT(matricula.id_aluno) >= 5;
+----------------------------------------------------------------------------------------------------------------------------
+
+/*19. Exibir o número de alunos por status, ordenando pelos status com mais alunos
+Crie uma consulta que mostre o número de alunos em cada status de matrícula (Ativo, Concluído, Trancado), ordenando pelos status com mais alunos.*/
+
+SELECT matricula.status, COUNT(matricula.id_aluno) AS total_alunos
+FROM matricula
+GROUP BY matricula.status
+ORDER BY total_alunos DESC;
+---------------------------------------------------------------------------------------------------------------------------------------
+
+/*20. Listar professores e a soma da carga horária das disciplinas que lecionam
+Crie uma consulta que exiba o nome dos professores e a soma da carga horária total das disciplinas que eles lecionam, ordenando pelos professores que lecionam disciplinas com mais horas.*/
+
+SELECT professor.nome AS professor, SUM(disciplina.carga_horaria) AS total_carga_horaria
+FROM professor
+JOIN turma ON professor.id_professor = turma.id_professor
+JOIN disciplina ON turma.id_disciplina = disciplina.id_disciplina
+GROUP BY professor.nome
+ORDER BY total_carga_horaria DESC;
+-----------------------------------------------------------------------------------------------------------------------------------------
