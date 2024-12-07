@@ -1,5 +1,3 @@
-# README
-
 ## Overview
 
 Este projeto contém pacotes PL/SQL para gerenciar informações relacionadas a alunos, disciplinas e professores em um ambiente acadêmico. Os pacotes foram criados para oferecer funcionalidades como:
